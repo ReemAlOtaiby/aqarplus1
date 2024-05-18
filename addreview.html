@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit a Review</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      resize: vertical;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      min-height: 100px;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    #responseMessage {
+      margin-top: 20px;
+    }
+
+    /* Hide the radio buttons */
+    input[type="radio"] {
+      display: none;
+    }
+
+    /* Style labels to look like stars */
+    #rate:before {
+      content: '☆';
+      font-size: 25px;
+      color: #ccc;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    /* Style checked labels to show filled stars */
+    input[type="radio"]:checked ~ #rate:before {
+      content: '★';
+      color: gold;
+    }
+  </style>
+</head>
+  </style>
+</head>
+<body>
+  <body>
+    <div class="container">
+      <h1>Submit a Review</h1>
+      <form id="reviewForm">
+        <div id="rating">
+          <!-- Star rating input -->
+          <input type="radio" id="star5" name="rating" value="5" /><label id="rate" for="star5" title="5 stars"></label>
+          <input type="radio" id="star4" name="rating" value="4" /><label id="rate" for="star4" title="4 stars"></label>
+          <input type="radio" id="star3" name="rating" value="3" /><label id="rate" for="star3" title="3 stars"></label>
+          <input type="radio" id="star2" name="rating" value="2" /><label id="rate" for="star2" title="2 stars"></label>
+          <input type="radio" id="star1" name="rating" value="1" /><label id="rate" for="star1" title="1 star"></label>
+        </div>
+        <label for="comment">Comment:</label>
+        <textarea id="comment" name="comment" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+      <div id="responseMessage"></div>
+    </div>
+    <!-- ... existing script ... -->
+  </body>
+  <script>
+    document.getElementById('reviewForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent the default form submission
+
+      const comment = document.getElementById('comment').value;
+
+      // Create the review object
+      const review = {
+        comment: comment
+      };
+
+      // Send a POST request to the server
+      fetch('http://localhost:3016/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(review)
+      })
+      .then(response => response.json())
+      .then(data => {
+        const responseMessage = document.getElementById('responseMessage');
+        if (data.error) {
+          responseMessage.textContent = `Error: ${data.error}`;
+          responseMessage.style.color = 'red';
+        } else {
+          responseMessage.textContent = 'Review added successfully!';
+          responseMessage.style.color = 'green';
+          document.getElementById('reviewForm').reset();
+          alert('Review submitted successfully!');
+        }
+      })
+      .catch(error => {
+        const responseMessage = document.getElementById('responseMessage');
+        responseMessage.textContent = 'Error: Unable to add review';
+        responseMessage.style.color = 'red';
+      });
+    });
+  </script>
+</body>
+</html>

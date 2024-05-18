@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Property Listings</title>
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>  
+.topnav {
+overflow: hidden;
+}
+.topnav input[type=text] {
+  display: flex;
+  align-items: center;
+  float: center;
+  padding: 6px;
+  border: none;
+  margin-top: 8px;
+  margin-right: 16px;
+  font-size: 17px;
+height: 1cm;
+width: 15cm;
+}
+.navbar-brand {
+  margin-right: auto; 
+}
+
+.search-bar {
+  flex-grow: 1; 
+   display: flex;
+  justify-content: center; 
+  margin-left: 150px;
+}
+
+.search-bar input {
+  width: 100%; 
+}
+
+.navbar-nav {
+  margin-left: auto; 
+}
+.card {
+margin-bottom: 20px;
+height: 650px;}
+
+.card-img-top {
+height: 400px;
+object-fit: cover; }
+  
+body {
+background-color: #E5D3B3; }
+
+.jumbotron {
+background-color: #D2B48C;
+color: #fff; }
+    
+.search-bar {
+text-align: center;
+margin-top: 20px;}
+    
+.search-bar input[type=text] {
+padding: 6px;
+border: none;
+font-size: 17px;}
+    
+.add-property-btn {
+text-align: right;
+margin-bottom: 20px;}
+    
+.add-property-btn a {
+color: #fff;
+background-color: #8B4513;}
+    
+.add-property-btn a:hover {
+color: #acacac;
+background-color: #8B4513; }
+
+</style>    
+</head>
+<body>
+
+  
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #D2B48C">
+  <div class="navbar-brand">
+    <img src="LOGO-NOBG.png" class="AQARLOGO" alt="LOGO1" style="width: 160px; height: 160px;">
+  </div>
+  <div class="container">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search properties...">
+  </div>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav" id="navbar-list">
+        <li class="nav-item">
+          <a class="nav-link" href="home.html" style="color: white;">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="services.html" style="color: white;">Services</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="properties.html" style="color: white;">Properties</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="aboutus.html" style="color: white;">About Us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="contact.html" style="color: white;">Contact Us</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <h1 class="display-6">Do you have a property to SELL?</h1>
+      <p class="lead">Add your property in one simple step!</p>
+    </div>
+  </div>
+    <div class="container">
+        <div class="add-property-btn">
+            <a href="addproperty.html" class="btn btn-primary">Add Property</a>
+        </div>
+       
+        <br>
+        <div id="propertyList" class="row"></div> 
+    </div>
+
+    <footer class="text-light text-center py-3"  style="background-color: #D2B48C">
+      <div class="container">
+        <p>&copy; 2024 AQAR-PLUS. All rights reserved.</p>
+      </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reviewModalLabel">Submit a Review</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Include the review form here -->
+        <!-- You can either directly include the form HTML or load it dynamically via JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Review Modal -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let data;
+
+            const propertyList = document.getElementById('propertyList');
+            const searchInput = document.getElementById('searchInput');
+
+            fetch('http://localhost:3016/properties')
+                .then(response => response.json())
+                .then(propertyData => {
+                    data = propertyData;
+                    renderProperties(data);
+                })
+                .catch(error => console.error('Error fetching properties:', error));
+
+            searchInput.addEventListener('input', function () {
+                const searchQuery = this.value.toLowerCase();
+                const filteredProperties = data.filter(property => {
+                    return (
+                        property.property_name.toLowerCase().includes(searchQuery) ||
+                        property.description.toLowerCase().includes(searchQuery) ||
+                        property.owner_name.toLowerCase().includes(searchQuery)
+                    );
+                });
+                renderProperties(filteredProperties);
+            });
+
+            function renderProperties(properties) {
+                propertyList.innerHTML = '';
+                properties.forEach(property => {
+                    const card = `
+                        <div class="col-md-4">
+                            <div class="card">
+                                <img src="${property.image_url}" class="card-img-top" alt="Property Image">
+                                <div class="card-body">
+                                    <h5 class="card-title">${property.property_name}</h5>
+                                    <p class="card-text">Price: ${property.price}</p>
+                                    <p class="card-text">Description: ${property.description}</p>
+                                    <p class="card-text">Owner Name: ${property.owner_name}</p>
+                                    <p class="card-text">Owner Contact: ${property.owner_contact}</p>
+                                    <button type="button" class="btn btn-primary" onclick="openReviewModal()">Review</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    propertyList.innerHTML += card;
+                });
+            }
+        });
+
+        function openReviewModal() {
+    // Check if the user is logged in
+    if (isLoggedIn()) {
+        $('#reviewModal').modal('show');
+    } else {
+        alert('You must be logged in to submit a review.');
+    }
+}
+
+// Placeholder function for user authentication check
+function isLoggedIn() {
+    // Implement your user authentication check logic here
+    // For now, it returns true for demonstration purposes
+    return true;
+}
+    </script>
+</body>
+</html>
